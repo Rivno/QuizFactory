@@ -18,8 +18,8 @@ app.use(express.static('./public'));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
-server.listen(3000, function(){
-  console.log('Express server listening on port ' + 3000);
+server.listen(process.env.port, function(){
+  console.log('Express server listening on port ' + process.env.port);
 });
 
 gameEngine.start(io);
