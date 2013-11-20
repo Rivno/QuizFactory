@@ -120,6 +120,17 @@ exports.start = function(io) {
 	        socket.emit('next', currentQuiz);
 	        socket.broadcast.to(currentPartyName).emit('next', currentQuiz);
 	        socket.broadcast.to(currentPartyName).emit('playerWin', player);
+
+	        if (index >= max) {
+	            listPlayer = {};
+				logs = [];
+				index = 0;
+				max = 10;
+				listQuiz = [];
+				currentQuiz = null;
+				isStart = false;
+				partyName = 'quiz' + (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+	        }
 	    });
 
 	    socket.on('newPlayer', function (player) {
@@ -137,7 +148,7 @@ exports.start = function(io) {
 	    });
 
 	    socket.on('newParty', function () {
-	    	if (isStart === true && currentPartyName === partyName) {
+	    	/*if (/*isStart === true && currentPartyName === partyName) {
 				listPlayer = {};
 				logs = [];
 				index = 0;
@@ -146,7 +157,7 @@ exports.start = function(io) {
 				currentQuiz = null;
 				isStart = false;
 				partyName = 'quiz' + (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-			}
+			}*/
 
 			socket.leave(currentPartyName);
 			currentPartyName = partyName;
