@@ -66,12 +66,30 @@ exports.start = function(io) {
 	        });
 	    };
 
-	    /*socket.emit('getAllQuiz', 
-	    	{ listPlayer: listPlayer
-                , logs: logs
-                , isStart: isStart
-                , currentQuiz: currentQuiz 
-        });*/
+	    socket.on('newParty', function () {
+			socket.leave(currentPartyName);
+			currentPartyName = partyName;
+			socket.join(currentPartyName);
+			socket.emit('getAllQuiz', 
+		    	{ listPlayer: listPlayer
+	                , logs: logs
+	                , isStart: isStart
+	                , currentQuiz: currentQuiz 
+        	});
+	    });
+
+	    socket.on('newPlayer', function (player) {
+	        listPlayer[player.guid] = player;
+	        player.ready = false;
+	        logs.push(player);
+
+	        if (isStart === true) {
+	        	console.log('plop');
+	        	player.ready = true;
+	        }
+
+	        socket.broadcast.to(currentPartyName).emit('newPlayer', player);
+	    });
 
 	    socket.on('ready', function (player) {
 	        var existPlayer = listPlayer[player.guid];
@@ -99,7 +117,6 @@ exports.start = function(io) {
 	        }
 	    });
 
-	    // Quand on recoit un nouveau message
 	    socket.on('playerWin', function (player) {
 	        var existPlayer = listPlayer[player.guid];
 
@@ -116,7 +133,6 @@ exports.start = function(io) {
 	            currentQuiz = { isFinish : true };
 	        }
 
-	        // On envoie a tout les clients connectes (sauf celui qui a appelle l'evenement) le nouveau message
 	        socket.emit('next', currentQuiz);
 	        socket.broadcast.to(currentPartyName).emit('next', currentQuiz);
 	        socket.broadcast.to(currentPartyName).emit('playerWin', player);
@@ -131,43 +147,6 @@ exports.start = function(io) {
 				isStart = false;
 				partyName = 'quiz' + (((1+Math.random())*0x10000)|0).toString(16).substring(1);
 	        }
-	    });
-
-	    socket.on('newPlayer', function (player) {
-	        listPlayer[player.guid] = player;
-	        player.ready = false;
-	        logs.push(player);
-
-	        if (isStart === true) {
-	        	console.log('plop');
-	        	player.ready = true;
-	        }
-
-	        // On envoie a tout les clients connectes (sauf celui qui a appelle l'evenement) le nouveau message
-	        socket.broadcast.to(currentPartyName).emit('newPlayer', player);
-	    });
-
-	    socket.on('newParty', function () {
-	    	/*if (/*isStart === true && currentPartyName === partyName) {
-				listPlayer = {};
-				logs = [];
-				index = 0;
-				max = 10;
-				listQuiz = [];
-				currentQuiz = null;
-				isStart = false;
-				partyName = 'quiz' + (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-			}*/
-
-			socket.leave(currentPartyName);
-			currentPartyName = partyName;
-			socket.join(currentPartyName);
-			socket.emit('getAllQuiz', 
-		    	{ listPlayer: listPlayer
-	                , logs: logs
-	                , isStart: isStart
-	                , currentQuiz: currentQuiz 
-        	});
 	    });
 	});
 };

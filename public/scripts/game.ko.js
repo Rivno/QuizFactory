@@ -21,14 +21,6 @@ var mainViewModel = function () {
     /* Private */
     var socket = null;
 
-    var win = function () {
-        self.player.message = " a trouvé(e) la réponse. (" + self.currentQuiz().score  + " points)";
-
-        socket.emit('playerWin', ko.toJS(self.player));
-        
-        self.logs.push(self.player);
-    }
-
     var getAllQuiz = function (data) {
         self.logs(data.logs);
 
@@ -55,7 +47,29 @@ var mainViewModel = function () {
         }
     }
 
-    var next = function (quiz) {        
+    var start = function (showTimer) {
+        self.showTimer(true);
+        setTimeout(timer, 1000);
+    }
+
+    var timer = function () {
+        self.timer(self.timer() - 1);
+
+        if (self.timer() > 0) {
+            setTimeout(timer, 1000);
+        }
+    }
+
+    var newPlayer = function (player) {
+        existPlayer = new playerObject();
+        existPlayer.guid = player.guid;
+        existPlayer.pseudo = player.pseudo;
+        existPlayer.score(player.score);
+        self.listPlayer.push(existPlayer);
+        self.logs.push(player);
+    }
+
+    var next = function (quiz) {
         if (quiz.isFinish) {
             self.isFinish(true);
         }
@@ -67,6 +81,14 @@ var mainViewModel = function () {
             self.isStart(true);
             self.showTimer(false);
         }
+    }
+
+    var win = function () {
+        self.player.message = " a trouvé(e) la réponse. (" + self.currentQuiz().score  + " points)";
+
+        socket.emit('playerWin', ko.toJS(self.player));
+        
+        self.logs.push(self.player);
     }
 
     var playerWin = function (player) {
@@ -83,28 +105,6 @@ var mainViewModel = function () {
 
         existPlayer.score(player.score);
         self.logs.push(player);
-    }
-
-    var newPlayer = function (player) {
-        existPlayer = new playerObject();
-        existPlayer.guid = player.guid;
-        existPlayer.pseudo = player.pseudo;
-        existPlayer.score(player.score);
-        self.listPlayer.push(existPlayer);
-        self.logs.push(player);
-    }
-
-    var timer = function () {
-        self.timer(self.timer() - 1);
-
-        if (self.timer() > 0) {
-            setTimeout(timer, 1000);
-        }
-    }
-
-    var start = function (showTimer) {
-        self.showTimer(true);
-        setTimeout(timer, 1000);
     }
     /* Private End */
 
@@ -135,11 +135,6 @@ var mainViewModel = function () {
             self.setPseudo();
         }
     }
-    
-    self.ready = function () {
-        self.isReady(true);
-        socket.emit('ready', ko.toJS(self.player));
-    }
 
     self.setPseudo = function () {
         self.player.guid = guid();
@@ -150,7 +145,6 @@ var mainViewModel = function () {
         // On se connecte au serveur
         socket = io.connect();
 
-        // On creer l'evenement recupererMessages pour recuperer direcement les messages sur serveur
         socket.on('getAllQuiz', getAllQuiz);
         socket.on('playerWin', playerWin);
         socket.on('newPlayer', newPlayer);
@@ -161,22 +155,10 @@ var mainViewModel = function () {
         socket.emit('newParty', true);
         socket.emit('newPlayer', ko.toJS(self.player));
     }
-
-    self.newParty = function () {
-        socket.emit('newParty', true);
-
-        self.listPlayer.removeAll();
-        self.logs.removeAll();
-        self.player.score(0);
-        self.timer(10);
-        self.isReady(false);
-        self.isStart(false);
-        self.isFinish(false);
-        self.showTimer(false);
-        self.listPlayer.push(self.player);
-
-        self.player.message = " est connecté(e).";
-        socket.emit('newPlayer', ko.toJS(self.player));
+    
+    self.ready = function () {
+        self.isReady(true);
+        socket.emit('ready', ko.toJS(self.player));
     }
 
     self.onKeyUpWin = function (data, event) {
@@ -194,6 +176,23 @@ var mainViewModel = function () {
         }
 
         self.response("");
+    }
+
+    self.newParty = function () {
+        socket.emit('newParty', true);
+
+        self.listPlayer.removeAll();
+        self.logs.removeAll();
+        self.player.score(0);
+        self.timer(10);
+        self.isReady(false);
+        self.isStart(false);
+        self.isFinish(false);
+        self.showTimer(false);
+        self.listPlayer.push(self.player);
+
+        self.player.message = " est connecté(e).";
+        socket.emit('newPlayer', ko.toJS(self.player));
     }
     /* Public End */
 }

@@ -13,12 +13,16 @@ var gameControllerModule = require('./controllers/gameController');
 var gameEngine = require('./engines/gameEngine');
 var gameController = new gameControllerModule.gameController();
 htmlMapRoute.map(app, [gameController]);
+app.get('/', gameController.index);
 app.use(express.static('./public'));
 
 var server = http.createServer(app);
+
+
 var io = require('socket.io').listen(server);
 
-server.listen(process.env.port, function(){
+
+server.listen(3000, function(){
   console.log('Express server listening on port ' + process.env.port);
 });
 
