@@ -22,7 +22,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 
-server.listen(3000, function(){
+server.listen(process.env.port, function(){
   console.log('Express server listening on port ' + process.env.port);
 });
 
