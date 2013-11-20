@@ -152,8 +152,7 @@ var mainViewModel = function () {
         socket.on('start', start);
 
         self.player.message = " est connecté(e).";
-        socket.emit('newParty', true);
-        socket.emit('newPlayer', ko.toJS(self.player));
+        socket.emit('newParty', ko.toJS(self.player));
     }
     
     self.ready = function () {
@@ -179,20 +178,18 @@ var mainViewModel = function () {
     }
 
     self.newParty = function () {
-        socket.emit('newParty', true);
+        self.player.score(0);
+        self.player.message = " est connecté(e).";
+        socket.emit('newParty', ko.toJS(self.player));
 
         self.listPlayer.removeAll();
         self.logs.removeAll();
-        self.player.score(0);
         self.timer(10);
         self.isReady(false);
         self.isStart(false);
         self.isFinish(false);
         self.showTimer(false);
         self.listPlayer.push(self.player);
-
-        self.player.message = " est connecté(e).";
-        socket.emit('newPlayer', ko.toJS(self.player));
     }
     /* Public End */
 }

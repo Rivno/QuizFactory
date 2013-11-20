@@ -66,7 +66,7 @@ exports.start = function(io) {
 	        });
 	    };
 
-	    socket.on('newParty', function () {
+	    socket.on('newParty', function (player) {
 			socket.leave(currentPartyName);
 			currentPartyName = partyName;
 			socket.join(currentPartyName);
@@ -76,15 +76,12 @@ exports.start = function(io) {
 	                , isStart: isStart
 	                , currentQuiz: currentQuiz 
         	});
-	    });
 
-	    socket.on('newPlayer', function (player) {
-	        listPlayer[player.guid] = player;
+        	listPlayer[player.guid] = player;
 	        player.ready = false;
 	        logs.push(player);
 
 	        if (isStart === true) {
-	        	console.log('plop');
 	        	player.ready = true;
 	        }
 
