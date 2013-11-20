@@ -1,0 +1,14 @@
+{
+  "name": "AbidbolQuiz",
+  "version": "0.1.0",
+  "author" : "Allan BIENNE <allan.bienne@d-cube.fr>",
+  "description" : "Abidbol Quiz : Le quiz des répliques cultes des célébrités",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.4.0",
+    "socket.io": "*"
+  }
+}
